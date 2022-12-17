@@ -29,6 +29,24 @@ function start() {
       case 'ls':
         manager.ls();
         break;
+      case 'cat':
+        manager.cat(line.split(' ')[1].trim());
+        break;
+      case 'add':
+        manager.add(line.split(' ')[1].trim());
+        break;
+      case 'cp':
+        manager.cp(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        break;
+      case 'mv':
+        manager.mv(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        break;
+      case 'rn':
+        manager.rn(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        break;
+      case 'rm':
+        manager.rm(line.split(' ')[1].trim());
+        break;
     }
   });
 }
