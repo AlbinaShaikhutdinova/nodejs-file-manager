@@ -1,6 +1,7 @@
 import * as readline from 'node:readline/promises';
 import { getHomeDirectory } from './os/getHomeDirectory.js';
 import { listFiles } from './stream/listFiles.js';
+import { sortFilesAndDirs } from './helpers/sortFilesAndDirs.js';
 export class FileManager {
   constructor({ input, output, args }) {
     this.rl = readline.createInterface({ input, output });
@@ -41,7 +42,7 @@ export class FileManager {
     listFiles(process.cwd(), this.displayList.bind(this));
   }
   displayList(files) {
-    console.table(files);
+    console.table(sortFilesAndDirs(files));
     this.showCurrentDirectory();
     this.prompt();
   }
