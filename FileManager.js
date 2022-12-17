@@ -9,6 +9,7 @@ import { renameFile } from './stream/renameFile.js';
 import { copyFile } from './stream/copyFile.js';
 import { moveFile } from './stream/moveFile.js';
 import { deleteFile } from './stream/deleteFile.js';
+import { getHash } from './hash/getHash.js';
 export class FileManager {
   constructor({ input, output, args }) {
     this.rl = readline.createInterface({ input, output });
@@ -87,6 +88,13 @@ export class FileManager {
   async rm(path) {
     const res = await deleteFile(formatPath(path));
     console.log(res);
+    this.showCurrentDirectory();
+    this.prompt();
+  }
+
+  async hash(path) {
+    const res = await getHash(formatPath(path));
+    this.rl.write(res + '\r\n');
     this.showCurrentDirectory();
     this.prompt();
   }

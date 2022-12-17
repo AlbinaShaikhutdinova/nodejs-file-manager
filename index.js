@@ -47,6 +47,10 @@ function start() {
       case 'rm':
         manager.rm(line.split(' ')[1].trim());
         break;
+
+      case 'hash':
+        manager.hash(line.split(' ')[1].trim());
+        break;
     }
   });
 }
