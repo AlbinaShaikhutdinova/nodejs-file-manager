@@ -51,6 +51,9 @@ function start() {
       case 'hash':
         manager.hash(line.split(' ')[1].trim());
         break;
+      case 'os':
+        manager.os(line.split(' ')[1].trim());
+        break;
     }
   });
 }

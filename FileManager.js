@@ -10,6 +10,10 @@ import { copyFile } from './stream/copyFile.js';
 import { moveFile } from './stream/moveFile.js';
 import { deleteFile } from './stream/deleteFile.js';
 import { getHash } from './hash/getHash.js';
+import { getEOL } from './os/getEOL.js';
+import { getCPU } from './os/getCPU.js';
+import { getUsername } from './os/getUsername.js';
+import { getArchitecture } from './os/getArchitecture.js';
 export class FileManager {
   constructor({ input, output, args }) {
     this.rl = readline.createInterface({ input, output });
@@ -33,7 +37,6 @@ export class FileManager {
     process.chdir(this.currentDirectory);
   }
   showCurrentDirectory() {
-    //this.rl.write(`You are currently in ${this.currentDirectory}\n\r`);
     this.rl.write(`You are currently in ${process.cwd()}\n\r`);
   }
   prompt() {
@@ -54,7 +57,9 @@ export class FileManager {
     this.showCurrentDirectory();
     this.prompt();
   }
-
+  printNewLine() {
+    this.rl.write('\r\n');
+  }
   async cat(path) {
     const data = await readFile(formatPath(path));
     this.rl.write(data + '\n\r');
@@ -95,6 +100,36 @@ export class FileManager {
   async hash(path) {
     const res = await getHash(formatPath(path));
     this.rl.write(res + '\r\n');
+    this.showCurrentDirectory();
+    this.prompt();
+  }
+  async os(str) {
+    const command = str.replace(/^--/, '');
+    switch (command) {
+      case 'EOL':
+        this.rl.write(getEOL().replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+        break;
+      case 'cpus':
+        getCPU().forEach((item, id) => {
+          if (id === 0) {
+            this.rl.write(`${item.property}: ${item.value}`);
+          } else {
+            this.rl.write(`Model: ${item.model}, CLock Rate: ${item.speed} GHz`);
+          }
+          this.printNewLine();
+        });
+        break;
+      case 'homedir':
+        this.rl.write(getHomeDirectory());
+        break;
+      case 'username':
+        this.rl.write(getUsername());
+        break;
+      case 'architecture':
+        this.rl.write(getArchitecture());
+        break;
+    }
+    this.printNewLine();
     this.showCurrentDirectory();
     this.prompt();
   }
