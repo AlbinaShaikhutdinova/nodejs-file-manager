@@ -14,6 +14,8 @@ import { getEOL } from './os/getEOL.js';
 import { getCPU } from './os/getCPU.js';
 import { getUsername } from './os/getUsername.js';
 import { getArchitecture } from './os/getArchitecture.js';
+import { compress } from './zip/compress.js';
+import { decompress } from './zip/decompress.js';
 export class FileManager {
   constructor({ input, output, args }) {
     this.rl = readline.createInterface({ input, output });
@@ -129,6 +131,20 @@ export class FileManager {
         this.rl.write(getArchitecture());
         break;
     }
+    this.printNewLine();
+    this.showCurrentDirectory();
+    this.prompt();
+  }
+  async compress(source, target) {
+    const res = await compress(source, target);
+    console.log(res);
+    this.printNewLine();
+    this.showCurrentDirectory();
+    this.prompt();
+  }
+  async decompress(source, target) {
+    const res = await decompress(source, target);
+    console.log(res);
     this.printNewLine();
     this.showCurrentDirectory();
     this.prompt();

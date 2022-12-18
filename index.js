@@ -1,8 +1,6 @@
-import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'process';
 import { FileManager } from './FileManager.js';
 
-//const rl = readline.createInterface({ input, output });
 function start() {
   const args = process.argv.slice(2);
   const manager = new FileManager({ input, output, args });
@@ -47,14 +45,21 @@ function start() {
       case 'rm':
         manager.rm(line.split(' ')[1].trim());
         break;
-
       case 'hash':
         manager.hash(line.split(' ')[1].trim());
         break;
       case 'os':
         manager.os(line.split(' ')[1].trim());
         break;
+      case 'compress':
+        manager.compress(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        break;
+      case 'decompress':
+        manager.decompress(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        break;
     }
   });
 }
 start();
+// compress D:\JSProjects\RSNodeJS\file-manager\test\fileToRead.txt D:\JSProjects\RSNodeJS\file-manager\secondTest
+// decompress D:\JSProjects\RSNodeJS\file-manager\secondTest\fileToRead.br D:\JSProjects\RSNodeJS\file-manager\secondTest
