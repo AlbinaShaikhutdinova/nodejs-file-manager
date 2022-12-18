@@ -7,11 +7,11 @@ export async function copyFile(source, target) {
     try {
       const rs = fs.createReadStream(source, 'utf-8');
       const ws = fs.createWriteStream(path.join(target, fileName));
-      rs.on('error', (error) => reject(error));
-      ws.on('error', (error) => reject(error));
-      pipeline(rs, ws, (err) => (err ? reject(err) : resolve(true)));
+      rs.on('error', (error) => reject(false));
+      ws.on('error', (error) => reject(false));
+      pipeline(rs, ws, (err) => (err ? reject(false) : resolve(true)));
     } catch (err) {
-      reject(err);
+      reject(false);
     }
   });
 }

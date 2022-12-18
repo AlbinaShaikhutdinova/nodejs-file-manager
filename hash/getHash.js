@@ -8,7 +8,7 @@ export async function getHash(filePath) {
       hashSum.update(data);
       resolve(hashSum.digest('hex'));
     } catch (err) {
-      reject(err);
+      reject(false);
     }
   });
 }

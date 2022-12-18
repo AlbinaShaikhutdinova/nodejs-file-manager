@@ -6,9 +6,9 @@ export async function readFile(filePath) {
       let data = '';
       stream.on('data', (chunk) => (data += chunk));
       stream.on('end', () => resolve(data));
-      stream.on('error', (error) => reject(error));
+      stream.on('error', (error) => reject(false));
     } catch (err) {
-      reject(err);
+      reject(false);
     }
   });
 }

@@ -9,57 +9,60 @@ function start() {
   manager.showCurrentDirectory();
   manager.prompt();
   manager.rl.on('close', manager.sayBye.bind(manager));
-  manager.rl.on('line', (line) => {
-    switch (line.split(' ')[0].trim()) {
+  manager.rl.on('line', (input) => {
+    const line = input.trim().replace(/ +/g, ' ').split(' ');
+    switch (line[0]) {
       case 'up':
         manager.up();
-        manager.showCurrentDirectory();
-        manager.prompt();
         break;
       case '.exit':
-        manager.sayBye.bind(manager);
+        manager.rl.close();
         break;
       case 'cd':
-        manager.changeDirectory(line.split(' ')[1].trim());
-        manager.showCurrentDirectory();
-        manager.prompt();
+        manager.isEnoughArgs([line[1]], manager.changeDirectory.bind(manager, line[1]));
         break;
       case 'ls':
         manager.ls();
         break;
       case 'cat':
-        manager.cat(line.split(' ')[1].trim());
+        manager.isEnoughArgs([line[1]], manager.cat.bind(manager, line[1]));
         break;
       case 'add':
-        manager.add(line.split(' ')[1].trim());
+        manager.isEnoughArgs([line[1]], manager.add.bind(manager, line[1]));
         break;
       case 'cp':
-        manager.cp(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        manager.isEnoughArgs([line[1], line[2]], manager.cp.bind(manager, line[1], line[2]));
         break;
       case 'mv':
-        manager.mv(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        manager.isEnoughArgs([line[1], line[2]], manager.mv.bind(manager, line[1], line[2]));
         break;
       case 'rn':
-        manager.rn(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        manager.isEnoughArgs([line[1], line[2]], manager.rn.bind(manager, line[1], line[2]));
         break;
       case 'rm':
-        manager.rm(line.split(' ')[1].trim());
+        manager.isEnoughArgs([line[1]], manager.rm.bind(manager, line[1]));
         break;
       case 'hash':
-        manager.hash(line.split(' ')[1].trim());
+        manager.isEnoughArgs([line[1]], manager.hash.bind(manager, line[1]));
         break;
       case 'os':
-        manager.os(line.split(' ')[1].trim());
+        manager.isEnoughArgs([line[1]], manager.os.bind(manager, line[1]));
         break;
       case 'compress':
-        manager.compress(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        manager.isEnoughArgs([line[1], line[2]], manager.compress.bind(manager, line[1], line[2]));
         break;
       case 'decompress':
-        manager.decompress(line.split(' ')[1].trim(), line.split(' ')[2].trim());
+        manager.isEnoughArgs(
+          [line[1], line[2]],
+          manager.decompress.bind(manager, line[1], line[2])
+        );
+        break;
+      case 'Invalid':
+        break;
+      default:
+        manager.showInvalidInputMessage();
         break;
     }
   });
 }
 start();
-// compress D:\JSProjects\RSNodeJS\file-manager\test\fileToRead.txt D:\JSProjects\RSNodeJS\file-manager\secondTest
-// decompress D:\JSProjects\RSNodeJS\file-manager\secondTest\fileToRead.br D:\JSProjects\RSNodeJS\file-manager\secondTest

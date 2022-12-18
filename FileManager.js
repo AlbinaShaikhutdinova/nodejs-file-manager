@@ -20,7 +20,7 @@ export class FileManager {
   constructor({ input, output, args }) {
     this.rl = readline.createInterface({ input, output });
     // add actual arg name check
-    this.userName = args.toString().split('=')[1];
+    this.userName = args.toString().split('=')[1] || 'Anonymous';
     this.currentDirectory = getHomeDirectory();
   }
   sayHi() {
@@ -29,6 +29,14 @@ export class FileManager {
   sayBye() {
     this.rl.write(`Thank you for using File Manager, ${this.userName}, goodbye!`);
     this.close();
+  }
+  showInvalidInputMessage() {
+    console.log('Invalid input\n\r');
+    this.prompt();
+  }
+  showOperationFailedMessage() {
+    console.log('Operation failed\n\r');
+    this.prompt();
   }
   close() {
     this.rl.pause();
@@ -39,17 +47,28 @@ export class FileManager {
     process.chdir(this.currentDirectory);
   }
   showCurrentDirectory() {
-    this.rl.write(`You are currently in ${process.cwd()}\n\r`);
+    console.log(`You are currently in ${process.cwd()}\n\r`);
   }
   prompt() {
     this.rl.prompt(true);
   }
   up() {
-    process.chdir('..');
-    this.currentDirectory = process.cwd();
+    try {
+      process.chdir('..');
+      this.showCurrentDirectory();
+      this.prompt();
+    } catch (err) {
+      this.showOperationFailedMessage();
+    }
   }
   changeDirectory(dir) {
-    process.chdir(dir);
+    try {
+      process.chdir(dir);
+      this.showCurrentDirectory();
+      this.prompt();
+    } catch (err) {
+      this.showOperationFailedMessage();
+    }
   }
   ls() {
     listFiles(process.cwd(), this.displayList.bind(this));
@@ -60,93 +79,99 @@ export class FileManager {
     this.prompt();
   }
   printNewLine() {
-    this.rl.write('\r\n');
+    console.log('\r\n');
   }
-  async cat(path) {
-    const data = await readFile(formatPath(path));
-    this.rl.write(data + '\n\r');
-    this.showCurrentDirectory();
-    this.prompt();
+  cat(path) {
+    this.getResult(readFile.bind(this, formatPath(path)), true);
   }
-  async add(path) {
-    const res = await createFile(formatPath(path));
-    console.log(res);
-    this.showCurrentDirectory();
-    this.prompt();
+  add(path) {
+    this.getResult(createFile.bind(this, formatPath(path)));
   }
-  async rn(path, newName) {
-    const res = await renameFile(formatPath(path), newName);
-    console.log(res);
-    this.showCurrentDirectory();
-    this.prompt();
+  rn(path, newName) {
+    this.getResult(renameFile.bind(this, formatPath(path), newName));
   }
   async cp(source, target) {
-    const res = await copyFile(formatPath(source), formatPath(target));
-    console.log(res);
-    this.showCurrentDirectory();
-    this.prompt();
+    this.getResult(copyFile.bind(this, formatPath(source), formatPath(target)));
   }
-  async mv(source, target) {
-    const res = await moveFile(formatPath(source), formatPath(target));
-    console.log(res);
-    this.showCurrentDirectory();
-    this.prompt();
+  mv(source, target) {
+    this.getResult(moveFile.bind(this, formatPath(source), formatPath(target)));
   }
-  async rm(path) {
-    const res = await deleteFile(formatPath(path));
-    console.log(res);
-    this.showCurrentDirectory();
-    this.prompt();
+  rm(path) {
+    this.getResult(deleteFile.bind(this, formatPath(path)));
   }
 
-  async hash(path) {
-    const res = await getHash(formatPath(path));
-    this.rl.write(res + '\r\n');
-    this.showCurrentDirectory();
-    this.prompt();
+  hash(path) {
+    this.getResult(getHash.bind(this, formatPath(path)), true);
   }
-  async os(str) {
-    const command = str.replace(/^--/, '');
+  async os(command) {
     switch (command) {
-      case 'EOL':
-        this.rl.write(getEOL().replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+      case '--EOL':
+        console.log(getEOL().replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+        this.printNewLine();
+        this.showCurrentDirectory();
+        this.prompt();
         break;
-      case 'cpus':
+      case '--cpus':
         getCPU().forEach((item, id) => {
           if (id === 0) {
-            this.rl.write(`${item.property}: ${item.value}`);
+            console.log(`${item.property}: ${item.value}`);
           } else {
-            this.rl.write(`Model: ${item.model}, CLock Rate: ${item.speed} GHz`);
+            console.log(`Model: ${item.model}, CLock Rate: ${item.speed} GHz`);
           }
           this.printNewLine();
         });
+        this.showCurrentDirectory();
+        this.prompt();
         break;
-      case 'homedir':
-        this.rl.write(getHomeDirectory());
+      case '--homedir':
+        console.log(getHomeDirectory());
+        this.printNewLine();
+        this.showCurrentDirectory();
+        this.prompt();
         break;
-      case 'username':
-        this.rl.write(getUsername());
+      case '--username':
+        console.log(getUsername());
+        this.printNewLine();
+        this.showCurrentDirectory();
+        this.prompt();
         break;
-      case 'architecture':
-        this.rl.write(getArchitecture());
+      case '--architecture':
+        console.log(getArchitecture());
+        this.printNewLine();
+        this.showCurrentDirectory();
+        this.prompt();
         break;
+      default:
+        this.showInvalidInputMessage();
     }
-    this.printNewLine();
-    this.showCurrentDirectory();
-    this.prompt();
   }
-  async compress(source, target) {
-    const res = await compress(source, target);
-    console.log(res);
-    this.printNewLine();
-    this.showCurrentDirectory();
-    this.prompt();
+  compress(source, target) {
+    this.getResult(compress.bind(this, source, target));
   }
-  async decompress(source, target) {
-    const res = await decompress(source, target);
-    console.log(res);
-    this.printNewLine();
-    this.showCurrentDirectory();
-    this.prompt();
+  decompress(source, target) {
+    this.getResult(decompress.bind(this, source, target));
+  }
+
+  isEnoughArgs(args, cb) {
+    let flag = true;
+    args.forEach((arg) => {
+      if (!arg) {
+        flag = false;
+      }
+    });
+    flag ? cb() : this.showInvalidInputMessage();
+  }
+  async getResult(func, printRes = false) {
+    try {
+      const res = await func();
+      if (printRes) {
+        console.log(res + '\r\n');
+      }
+      this.printNewLine();
+      this.showCurrentDirectory();
+      this.prompt();
+    } catch (err) {
+      this.showOperationFailedMessage();
+    }
   }
 }
