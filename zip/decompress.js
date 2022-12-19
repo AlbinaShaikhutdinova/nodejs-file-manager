@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
 export async function decompress(source, target) {
-  const destFile = path.join(target, path.basename(source).replace('br', 'txt'));
+  const destFile = path.join(target, path.basename(source).replace('.br', ''));
   const rs = fs.createReadStream(source);
   const ws = fs.createWriteStream(destFile);
   const brotli = zlib.createBrotliDecompress();

@@ -16,11 +16,13 @@ import { getUsername } from './os/getUsername.js';
 import { getArchitecture } from './os/getArchitecture.js';
 import { compress } from './zip/compress.js';
 import { decompress } from './zip/decompress.js';
+import { getName } from './helpers/getName.js';
 export class FileManager {
   constructor({ input, output, args }) {
     this.rl = readline.createInterface({ input, output });
     // add actual arg name check
-    this.userName = args.toString().split('=')[1] || 'Anonymous';
+    console.log(args);
+    this.userName = getName(args[0]);
     this.currentDirectory = getHomeDirectory();
   }
   sayHi() {
@@ -90,7 +92,7 @@ export class FileManager {
   rn(path, newName) {
     this.getResult(renameFile.bind(this, formatPath(path), newName));
   }
-  async cp(source, target) {
+  cp(source, target) {
     this.getResult(copyFile.bind(this, formatPath(source), formatPath(target)));
   }
   mv(source, target) {
